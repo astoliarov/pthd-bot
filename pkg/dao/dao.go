@@ -1,20 +1,20 @@
 package dao
 
 import (
-	"database/sql"
+	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
 	"teamkillbot/pkg/entities"
 )
 
-func OpenSQLite(pathToSQLite string) (*sql.DB, error) {
-	return sql.Open("sqlite3", "./teamkillbot.sqlite")
+func OpenSQLite(pathToSQLite string) (*sqlx.DB, error) {
+	return sqlx.Open("sqlite3", pathToSQLite)
 }
 
 type TeamKillLogDAO struct {
-	db *sql.DB
+	db *sqlx.DB
 }
 
-func NewTeamKillLogDAO(db *sql.DB) *TeamKillLogDAO {
+func NewTeamKillLogDAO(db *sqlx.DB) *TeamKillLogDAO {
 	return &TeamKillLogDAO{
 		db: db,
 	}
@@ -54,4 +54,58 @@ func (dao *TeamKillLogDAO) Save(kill *entities.TeamKill) error {
 	}
 
 	return nil
+}
+
+func (dao *TeamKillLogDAO) GetTopKillers() ([]*entities.TopKillerLog, error) {
+	query := `
+		SELECT killer as name, count(*) as kill_count
+		FROM team_kill_log
+		GROUP BY killer
+		ORDER BY kill_count desc
+		LIMIT 3;
+	`
+	rows, queryErr := dao.db.Queryx(query)
+	if queryErr != nil {
+		return nil, queryErr
+	}
+
+	var logs []*entities.TopKillerLog
+
+	for rows.Next() {
+		log := &entities.TopKillerLog{}
+		scanErr := rows.StructScan(log)
+		if scanErr != nil {
+			return nil, scanErr
+		}
+		logs = append(logs, log)
+	}
+
+	return logs, nil
+}
+
+func (dao *TeamKillLogDAO) GetTopVictims() ([]*entities.TopVictimLog, error) {
+	query := `
+		SELECT victim as name, count(*) as deaths_count
+		FROM team_kill_log
+		GROUP BY victim
+		ORDER BY deaths_count desc
+		LIMIT 3;
+	`
+	rows, queryErr := dao.db.Queryx(query)
+	if queryErr != nil {
+		return nil, queryErr
+	}
+
+	var logs []*entities.TopVictimLog
+
+	for rows.Next() {
+		log := &entities.TopVictimLog{}
+		scanErr := rows.StructScan(log)
+		if scanErr != nil {
+			return nil, scanErr
+		}
+		logs = append(logs, log)
+	}
+
+	return logs, nil
 }

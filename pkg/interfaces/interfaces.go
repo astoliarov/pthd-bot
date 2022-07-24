@@ -7,4 +7,6 @@ import (
 //go:generate mockgen -destination=../tests/mocks/iteamkilldao_mock.go -package=mocks teamkillbot/pkg ITeamKillLogDAO
 type ITeamKillLogDAO interface {
 	Save(kill *entities.TeamKill) error
+	GetTopKillers() ([]*entities.TopKillerLog, error)
+	GetTopVictims() ([]*entities.TopVictimLog, error)
 }

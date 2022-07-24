@@ -15,8 +15,23 @@ func getMessageType(text string) int {
 	if strings.HasPrefix(text, echoKey) {
 		return messageTypeEcho
 	}
+	if strings.HasPrefix(text, showKillers) {
+		return messageTypeShowKillers
+	}
+	if strings.HasPrefix(text, showVictims) {
+		return messageTypeShowVictims
+	}
 
 	return unprocessableMessage
+}
+
+func sendMessage(bot *tgbotapi.BotAPI, chatId int64, responseText string) error {
+	msg := tgbotapi.NewMessage(chatId, responseText)
+	_, sendErr := bot.Send(msg)
+	if sendErr != nil {
+		return sendErr
+	}
+	return nil
 }
 
 func replyToMessage(bot *tgbotapi.BotAPI, message *tgbotapi.Message, responseText string) error {
@@ -74,11 +89,67 @@ func (r MessageRouter) processMessage(message *tgbotapi.Message) error {
 		return r.processMessageTeamKill(message)
 	}
 
+	if messageType == messageTypeShowKillers {
+		return r.processMessageShowKillers(message)
+	}
+
+	if messageType == messageTypeShowVictims {
+		return r.processMessageShowVictims(message)
+	}
+
 	return nil
 }
 
 func (r MessageRouter) processMessageEcho(message *tgbotapi.Message) error {
 	return replyToMessage(r.bot, message, message.Text)
+}
+
+func (r MessageRouter) processMessageShowKillers(message *tgbotapi.Message) error {
+
+	topKillersLog, err := r.teamKillService.ProcessGetTopKillers()
+	if err != nil {
+		replyErr := replyToMessage(r.bot, message, cannotProcessMessage)
+		log.Printf("Error while trying to send message about error, while processing command: %s", replyErr)
+		return err
+	}
+
+	var rows []string
+	for _, killLog := range topKillersLog {
+		row := fmt.Sprintf("Убивца: %s; Намолотил: %d", killLog.Name, killLog.KillCount)
+		rows = append(rows, row)
+	}
+	msg := strings.Join(rows, "\n")
+
+	sendErr := sendMessage(r.bot, message.Chat.ID, msg)
+	if sendErr != nil {
+		log.Printf("Error while trying to send message: %s", sendErr)
+	}
+
+	return nil
+}
+
+func (r MessageRouter) processMessageShowVictims(message *tgbotapi.Message) error {
+
+	topVictimsLog, err := r.teamKillService.ProcessGetTopVictims()
+	if err != nil {
+		replyErr := replyToMessage(r.bot, message, cannotProcessMessage)
+		log.Printf("Error while trying to send message about error, while processing command: %s", replyErr)
+		return err
+	}
+
+	var rows []string
+	for _, victimLog := range topVictimsLog {
+		row := fmt.Sprintf("Неудачник: %s; Наумирал: %d", victimLog.Name, victimLog.DeathsCount)
+		rows = append(rows, row)
+	}
+	msg := strings.Join(rows, "\n")
+
+	sendErr := sendMessage(r.bot, message.Chat.ID, msg)
+	if sendErr != nil {
+		log.Printf("Error while trying to send message: %s", sendErr)
+	}
+
+	return nil
 }
 
 func (r MessageRouter) processMessageTeamKill(message *tgbotapi.Message) error {

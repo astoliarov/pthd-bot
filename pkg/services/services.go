@@ -37,3 +37,11 @@ func (s *TeamKillService) ProcessTeamKill(request *TeamKillRequest) (string, err
 
 	return response, nil
 }
+
+func (s *TeamKillService) ProcessGetTopKillers() ([]*entities.TopKillerLog, error) {
+	return s.dao.GetTopKillers()
+}
+
+func (s *TeamKillService) ProcessGetTopVictims() ([]*entities.TopVictimLog, error) {
+	return s.dao.GetTopVictims()
+}
