@@ -1,0 +1,6 @@
+services:
+  teamkillbot:
+    build: .
+    environment:
+      teamkillbot_pathtosqlite: $teamkillbot_pathtosqlite
+      teamkillbot_bottgtoken: $teamkillbot_bottgtoken
