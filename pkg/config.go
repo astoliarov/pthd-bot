@@ -9,17 +9,20 @@ import (
 type Config struct {
 	PathToSQLite string
 	BotTGToken   string
+	SentryDSN    string
 }
 
 type ConfitaConfig struct {
 	PathToSQLite string `config:"teamkillbot_pathtosqlite"`
 	BotTGToken   string `config:"teamkillbot_bottgtoken"`
+	SentryDSN    string `config:"teamkillbot_sentry_dsn"`
 }
 
 func (cfg *ConfitaConfig) ToConfig() *Config {
 	return &Config{
 		PathToSQLite: cfg.PathToSQLite,
 		BotTGToken:   cfg.BotTGToken,
+		SentryDSN:    cfg.SentryDSN,
 	}
 }
 

@@ -2,17 +2,25 @@ package main
 
 import (
 	"fmt"
+	"github.com/getsentry/sentry-go"
 	"log"
 	"teamkillbot/pkg"
 	"teamkillbot/pkg/connectors/telegram"
 	"teamkillbot/pkg/dao"
 	"teamkillbot/pkg/services"
+	"time"
 )
 
 func main() {
 	config, configLoadErr := pkg.ConfitaConfigLoader()
 	if configLoadErr != nil {
 		log.Fatalf(fmt.Sprintf("Issue while loading config: %s", configLoadErr))
+	}
+
+	if config.SentryDSN != "" {
+		sentry.Init(sentry.ClientOptions{
+			Dsn: config.SentryDSN,
+		})
 	}
 
 	db, openErr := dao.OpenSQLite(config.PathToSQLite)
@@ -43,4 +51,6 @@ func main() {
 	)
 
 	router.ListenToUpdates()
+
+	defer sentry.Flush(2 * time.Second)
 }

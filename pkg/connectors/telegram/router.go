@@ -2,6 +2,7 @@ package telegram
 
 import (
 	"fmt"
+	"github.com/getsentry/sentry-go"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
 	"strings"
@@ -67,6 +68,7 @@ func (r MessageRouter) ListenToUpdates() {
 			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 			processErr := r.processMessage(update.Message)
 			if processErr != nil {
+				sentry.CaptureException(processErr)
 				log.Printf("Error while processing message: %s", processErr)
 			}
 		}
