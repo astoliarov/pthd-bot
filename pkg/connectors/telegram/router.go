@@ -1,4 +1,4 @@
-package connectors
+package telegram
 
 import (
 	"fmt"
@@ -7,15 +7,6 @@ import (
 	"strings"
 	"teamkillbot/pkg/services"
 )
-
-const unprocessableMessage = 0
-const messageTypeKillLog = 1
-const messageTypeEcho = 2
-
-const teamKillMessageKey = "#teamkill"
-const echoKey = "PTHD:echo"
-
-const CannotParseTeamKillMessage = "Чё ты понаписал? Не понятно ничего"
 
 func getMessageType(text string) int {
 	if strings.Contains(text, teamKillMessageKey) {
@@ -26,6 +17,16 @@ func getMessageType(text string) int {
 	}
 
 	return unprocessableMessage
+}
+
+func replyToMessage(bot *tgbotapi.BotAPI, message *tgbotapi.Message, responseText string) error {
+	msg := tgbotapi.NewMessage(message.Chat.ID, responseText)
+	msg.ReplyToMessageID = message.MessageID
+	_, sendErr := bot.Send(msg)
+	if sendErr != nil {
+		return sendErr
+	}
+	return nil
 }
 
 type MessageRouter struct {
@@ -77,21 +78,14 @@ func (r MessageRouter) processMessage(message *tgbotapi.Message) error {
 }
 
 func (r MessageRouter) processMessageEcho(message *tgbotapi.Message) error {
-	msg := tgbotapi.NewMessage(message.Chat.ID, message.Text)
-	msg.ReplyToMessageID = message.MessageID
-
-	_, sendErr := r.bot.Send(msg)
-
-	return sendErr
+	return replyToMessage(r.bot, message, message.Text)
 }
 
 func (r MessageRouter) processMessageTeamKill(message *tgbotapi.Message) error {
 	log.Printf("processing message team kill")
 	request := services.NewTeamKillFromText(message.Text)
 	if request == nil {
-		msg := tgbotapi.NewMessage(message.Chat.ID, CannotParseTeamKillMessage)
-		msg.ReplyToMessageID = message.MessageID
-		_, sendErr := r.bot.Send(msg)
+		sendErr := replyToMessage(r.bot, message, cannotParseTeamKillMessage)
 		if sendErr != nil {
 			return sendErr
 		}
@@ -103,9 +97,7 @@ func (r MessageRouter) processMessageTeamKill(message *tgbotapi.Message) error {
 	}
 
 	if response != "" {
-		msg := tgbotapi.NewMessage(message.Chat.ID, response)
-		msg.ReplyToMessageID = message.MessageID
-		_, sendErr := r.bot.Send(msg)
+		sendErr := replyToMessage(r.bot, message, response)
 		if sendErr != nil {
 			return sendErr
 		}
