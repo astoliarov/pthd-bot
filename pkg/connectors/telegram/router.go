@@ -1,6 +1,7 @@
 package telegram
 
 import (
+	"context"
 	"fmt"
 	"github.com/getsentry/sentry-go"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -76,20 +77,26 @@ func (r *MessageRouter) register(code int, processor func(message *tgbotapi.Mess
 	r.messageProcessors[code] = processor
 }
 
-func (r MessageRouter) ListenToUpdates() {
+func (r MessageRouter) ListenToUpdates(ctx context.Context) {
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 
 	updates := r.bot.GetUpdatesChan(u)
 
-	for update := range updates {
-		if update.Message != nil { // If we got a message
-			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
-			processErr := r.processMessage(update.Message)
-			if processErr != nil {
-				sentry.CaptureException(processErr)
-				log.Printf("Error while processing message: %s", processErr)
+	for {
+		select {
+		case update := <-updates:
+			if update.Message != nil { // If we got a message
+				log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
+				processErr := r.processMessage(update.Message)
+				if processErr != nil {
+					sentry.CaptureException(processErr)
+					log.Printf("Error while processing message: %s", processErr)
+				}
 			}
+		case <-ctx.Done():
+			log.Println("Stopping router")
+			return
 		}
 	}
 }
