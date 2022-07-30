@@ -19,6 +19,10 @@ func NewTeamKillFromText(text string) *TeamKillRequest {
 		return name
 	}
 
+	if len(parts) < 2 {
+		return nil
+	}
+
 	killer := convert(parts[0])
 	victim := convert(parts[1])
 
