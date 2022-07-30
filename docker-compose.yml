@@ -2,5 +2,8 @@ services:
   teamkillbot:
     build: .
     environment:
-      teamkillbot_pathtosqlite: $teamkillbot_pathtosqlite
-      teamkillbot_bottgtoken: $teamkillbot_bottgtoken
+      tkbot_db_path: /host-mnt/teamkillbot.sqlite
+      tkbot_tg_token: $tkbot_tg_token
+      tkbot_chat_id: $tkbot_chat_id
+    volumes:
+      - ./volumes/teamkillbot/:/host-mnt

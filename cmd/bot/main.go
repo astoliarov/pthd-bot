@@ -48,6 +48,7 @@ func main() {
 	router := telegram.NewMessageRouter(
 		bot,
 		teamKillService,
+		config.ChatID,
 	)
 
 	router.ListenToUpdates()

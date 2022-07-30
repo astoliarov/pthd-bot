@@ -10,12 +10,14 @@ type Config struct {
 	PathToSQLite string
 	BotTGToken   string
 	SentryDSN    string
+	ChatID       int64
 }
 
 type ConfitaConfig struct {
-	PathToSQLite string `config:"teamkillbot_pathtosqlite"`
-	BotTGToken   string `config:"teamkillbot_bottgtoken"`
-	SentryDSN    string `config:"teamkillbot_sentry_dsn"`
+	PathToSQLite string `config:"tkbot_db_path"`
+	BotTGToken   string `config:"tkbot_tg_token"`
+	SentryDSN    string `config:"tkbot_sentry_dsn"`
+	ChatID       int64  `config:"tkbot_chat_id"`
 }
 
 func (cfg *ConfitaConfig) ToConfig() *Config {
@@ -23,6 +25,7 @@ func (cfg *ConfitaConfig) ToConfig() *Config {
 		PathToSQLite: cfg.PathToSQLite,
 		BotTGToken:   cfg.BotTGToken,
 		SentryDSN:    cfg.SentryDSN,
+		ChatID:       cfg.ChatID,
 	}
 }
 

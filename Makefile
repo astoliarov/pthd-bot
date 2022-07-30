@@ -3,3 +3,9 @@ build:
 
 run/bot:
 	./bin/bot
+
+docker/build:
+	docker build . -t bghji/teamkillbot
+
+docker/push:
+	docker push bghji/teamkillbot

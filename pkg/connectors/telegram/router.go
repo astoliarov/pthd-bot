@@ -22,6 +22,9 @@ func getMessageType(text string) int {
 	if strings.HasPrefix(text, showVictims) {
 		return messageTypeShowVictims
 	}
+	if strings.HasPrefix(text, repeat) {
+		return messageTypeRepeat
+	}
 
 	return unprocessableMessage
 }
@@ -46,15 +49,31 @@ func replyToMessage(bot *tgbotapi.BotAPI, message *tgbotapi.Message, responseTex
 }
 
 type MessageRouter struct {
-	bot             *tgbotapi.BotAPI
-	teamKillService *services.TeamKillService
+	bot               *tgbotapi.BotAPI
+	teamKillService   *services.TeamKillService
+	messageProcessors map[int]func(message *tgbotapi.Message) error
+	chatID            int64
 }
 
-func NewMessageRouter(bot *tgbotapi.BotAPI, service *services.TeamKillService) *MessageRouter {
-	return &MessageRouter{
-		bot:             bot,
-		teamKillService: service,
+func NewMessageRouter(bot *tgbotapi.BotAPI, service *services.TeamKillService, chatID int64) *MessageRouter {
+	router := &MessageRouter{
+		bot:               bot,
+		teamKillService:   service,
+		messageProcessors: map[int]func(message *tgbotapi.Message) error{},
+		chatID:            chatID,
 	}
+
+	router.register(messageTypeEcho, router.processMessageEcho)
+	router.register(messageTypeKillLog, router.processMessageTeamKill)
+	router.register(messageTypeShowKillers, router.processMessageShowKillers)
+	router.register(messageTypeShowVictims, router.processMessageShowVictims)
+	router.register(messageTypeRepeat, router.processMessageRepeat)
+
+	return router
+}
+
+func (r *MessageRouter) register(code int, processor func(message *tgbotapi.Message) error) {
+	r.messageProcessors[code] = processor
 }
 
 func (r MessageRouter) ListenToUpdates() {
@@ -77,26 +96,19 @@ func (r MessageRouter) ListenToUpdates() {
 
 func (r MessageRouter) processMessage(message *tgbotapi.Message) error {
 	messageType := getMessageType(message.Text)
-	fmt.Println(messageType)
 
-	if messageType == unprocessableMessage {
+	if message.Chat.ID != r.chatID {
 		return nil
 	}
 
-	if messageType == messageTypeEcho {
-		return r.processMessageEcho(message)
+	processor, exists := r.messageProcessors[messageType]
+	if !exists {
+		return nil
 	}
 
-	if messageType == messageTypeKillLog {
-		return r.processMessageTeamKill(message)
-	}
-
-	if messageType == messageTypeShowKillers {
-		return r.processMessageShowKillers(message)
-	}
-
-	if messageType == messageTypeShowVictims {
-		return r.processMessageShowVictims(message)
+	err := processor(message)
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -171,6 +183,40 @@ func (r MessageRouter) processMessageTeamKill(message *tgbotapi.Message) error {
 
 	if response != "" {
 		sendErr := replyToMessage(r.bot, message, response)
+		if sendErr != nil {
+			return sendErr
+		}
+	}
+
+	return nil
+}
+
+func (r MessageRouter) processMessageRepeat(message *tgbotapi.Message) error {
+	log.Printf("processing message repeat")
+
+	if message.ReplyToMessage == nil {
+		sendErr := replyToMessage(r.bot, message, "Нечего повторять, ну")
+		if sendErr != nil {
+			return sendErr
+		}
+		return nil
+	}
+
+	request := services.NewTeamKillFromText(message.ReplyToMessage.Text)
+	if request == nil {
+		sendErr := replyToMessage(r.bot, message.ReplyToMessage, cannotParseTeamKillMessage)
+		if sendErr != nil {
+			return sendErr
+		}
+	}
+
+	response, processErr := r.teamKillService.ProcessTeamKill(request)
+	if processErr != nil {
+		return processErr
+	}
+
+	if response != "" {
+		sendErr := replyToMessage(r.bot, message.ReplyToMessage, response)
 		if sendErr != nil {
 			return sendErr
 		}
