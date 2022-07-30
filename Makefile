@@ -5,7 +5,7 @@ run/bot:
 	./bin/bot
 
 docker/build:
-	docker build . -t bghji/teamkillbot
+	docker buildx build -t bghji/teamkillbot . --platform=linux/amd64
 
 docker/push:
 	docker push bghji/teamkillbot
