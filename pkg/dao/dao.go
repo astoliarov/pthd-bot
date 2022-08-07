@@ -61,8 +61,7 @@ func (dao *TeamKillLogDAO) GetTopKillers() ([]*entities.TopKillerLog, error) {
 		SELECT killer as name, count(*) as kill_count
 		FROM team_kill_log
 		GROUP BY killer
-		ORDER BY kill_count desc
-		LIMIT 3;
+		ORDER BY kill_count desc;
 	`
 	rows, queryErr := dao.db.Queryx(query)
 	if queryErr != nil {
@@ -88,8 +87,7 @@ func (dao *TeamKillLogDAO) GetTopVictims() ([]*entities.TopVictimLog, error) {
 		SELECT victim as name, count(*) as deaths_count
 		FROM team_kill_log
 		GROUP BY victim
-		ORDER BY deaths_count desc
-		LIMIT 3;
+		ORDER BY deaths_count desc;
 	`
 	rows, queryErr := dao.db.Queryx(query)
 	if queryErr != nil {
