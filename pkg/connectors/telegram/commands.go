@@ -25,7 +25,7 @@ func (c *CommandEcho) IsCommand(text string) bool {
 }
 
 func (c *CommandEcho) GetHelp() string {
-	return "PTHD:echo - simple echo text"
+	return fmt.Sprintf("%s - повторить сообщение", echoKey)
 }
 
 type TeamKillCommand struct {
@@ -63,7 +63,7 @@ func (c *TeamKillCommand) IsCommand(text string) bool {
 }
 
 func (c *TeamKillCommand) GetHelp() string {
-	return "<name> #teamkill <name> - log team kill"
+	return "<name> #teamkill <name> - записать тимкилл"
 }
 
 type ShowKillersCommand struct {
@@ -98,7 +98,7 @@ func (c *ShowKillersCommand) IsCommand(text string) bool {
 }
 
 func (c *ShowKillersCommand) GetHelp() string {
-	return "PTHD:покажи убивц - show killers log"
+	return fmt.Sprintf("%s - показать список тимкиллов", showKillers)
 }
 
 type ShowVictimsCommand struct {
@@ -133,7 +133,7 @@ func (c *ShowVictimsCommand) IsCommand(text string) bool {
 }
 
 func (c *ShowVictimsCommand) GetHelp() string {
-	return "PTHD:покажи неудачников - show victims log"
+	return fmt.Sprintf("%s - вывести список жертв", showVictims)
 }
 
 type RepeatCommand struct {
@@ -180,7 +180,7 @@ func (c *RepeatCommand) IsCommand(text string) bool {
 }
 
 func (c *RepeatCommand) GetHelp() string {
-	return "PTHD:repeat - show victims log"
+	return fmt.Sprintf("%s - обработать предыдущее сообщение об убийстве", repeat)
 }
 
 type HelpCommand struct {
@@ -188,11 +188,11 @@ type HelpCommand struct {
 }
 
 func (c *HelpCommand) IsCommand(text string) bool {
-	return strings.HasPrefix(text, "PTHD:help")
+	return strings.HasPrefix(text, help)
 }
 
 func (c *HelpCommand) GetHelp() string {
-	return "PTHD:help - help list"
+	return fmt.Sprintf("%s - вывести помощь", help)
 }
 
 func (c *HelpCommand) Process(bot *tgbotapi.BotAPI, message *tgbotapi.Message) error {
