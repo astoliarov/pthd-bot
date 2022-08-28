@@ -5,13 +5,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"log"
-	"os"
 	"teamkillbot/pkg/entities"
 	"testing"
 	"time"
 )
-
-const testDatabasePath = "./dao_test_case.sqlite"
 
 type TeamKillLogDAOTestCase struct {
 	suite.Suite
@@ -23,7 +20,7 @@ type TeamKillLogDAOTestCase struct {
 func (s *TeamKillLogDAOTestCase) SetupSuite() {
 	log.Println("SetupSuite()")
 
-	db, openErr := sqlx.Open("sqlite3", testDatabasePath)
+	db, openErr := sqlx.Open("sqlite3", ":memory:")
 	if openErr != nil {
 		log.Fatalf("Cannot open test sqlite: %s", openErr)
 	}
@@ -42,7 +39,6 @@ func (s *TeamKillLogDAOTestCase) TearDownSuite() {
 	log.Println("TearDownSuite()")
 
 	s.db.Close()
-	os.Remove(testDatabasePath)
 }
 
 func (s *TeamKillLogDAOTestCase) BeforeTest(suiteName, testName string) {
