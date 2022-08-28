@@ -17,4 +17,5 @@ ENV TZ Europe/Minsk
 
 WORKDIR "/teamkillbot"
 COPY --from=builder /go/src/teamkillbot/bin/bot .
+COPY --from=builder /go/src/teamkillbot/bin/migrate .
 CMD ["/teamkillbot/bot"]

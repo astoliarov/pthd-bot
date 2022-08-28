@@ -30,5 +30,9 @@ func main() {
 		log.Println("Received break signal")
 	}()
 
+	migrateErr := app.MigrateUp()
+	if migrateErr != nil {
+		log.Fatalln(migrateErr)
+	}
 	app.RunBot(ctx)
 }
