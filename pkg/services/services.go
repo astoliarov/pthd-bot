@@ -19,11 +19,11 @@ func NewTeamKillService(dao interfaces.ITeamKillLogDAO, responseSelector *Respon
 	}
 }
 
-func (s *TeamKillService) ProcessTeamKill(request *TeamKillRequest) (string, error) {
-
+func (s *TeamKillService) ProcessTeamKill(request *TeamKillRequest, source string) (string, error) {
 	teamKill := &entities.TeamKill{
 		Killer:     s.normalizeName(request.Killer),
 		Victim:     s.normalizeName(request.Victim),
+		Source:     source,
 		HappenedAt: time.Now(),
 	}
 	saveErr := s.dao.Save(teamKill)
@@ -45,10 +45,10 @@ func (s *TeamKillService) normalizeName(name string) string {
 	return name
 }
 
-func (s *TeamKillService) ProcessGetTopKillers() ([]*entities.TopKillerLog, error) {
-	return s.dao.GetTopKillers()
+func (s *TeamKillService) ProcessGetTopKillers(source string) ([]*entities.TopKillerLog, error) {
+	return s.dao.GetTopKillers(source)
 }
 
-func (s *TeamKillService) ProcessGetTopVictims() ([]*entities.TopVictimLog, error) {
-	return s.dao.GetTopVictims()
+func (s *TeamKillService) ProcessGetTopVictims(source string) ([]*entities.TopVictimLog, error) {
+	return s.dao.GetTopVictims(source)
 }

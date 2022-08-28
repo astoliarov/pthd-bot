@@ -36,10 +36,11 @@ func (suite *TeamKillServiceTestCase) Test_ProcessTeamKill_PassedRequest_SavedTe
 		Killer: "Roma",
 		Victim: "Igor",
 	}
+	source := "test"
 
 	suite.daoMock.EXPECT().Save(gomock.Any()).Return(nil)
 
-	response, err := suite.service.ProcessTeamKill(request)
+	response, err := suite.service.ProcessTeamKill(request, source)
 
 	assert.Nil(suite.T(), err)
 	assert.NotEqual(suite.T(), "", response)
@@ -55,7 +56,9 @@ func (suite *TeamKillServiceTestCase) Test_ProcessTeamKill_SaveReturnedError_Pro
 
 	suite.daoMock.EXPECT().Save(gomock.Any()).Return(saveErr)
 
-	response, err := suite.service.ProcessTeamKill(request)
+	source := "test"
+
+	response, err := suite.service.ProcessTeamKill(request, source)
 
 	assert.Equal(suite.T(), err, saveErr)
 	assert.Equal(suite.T(), response, "")

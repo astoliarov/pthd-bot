@@ -31,10 +31,6 @@ func NewApplication() *Application {
 	}
 
 	teamKillDAO := dao.NewTeamKillLogDAO(db)
-	createErr := teamKillDAO.EnsureTable()
-	if createErr != nil {
-		log.Fatalf("Cannot create table: %s", createErr)
-	}
 
 	responseSelector := &services.ResponseSelectorService{}
 	teamKillService := services.NewTeamKillService(
@@ -67,4 +63,8 @@ func (app *Application) RunBot(ctx context.Context) {
 	router.ListenToUpdates(ctx)
 
 	defer sentry.Flush(2 * time.Second)
+}
+
+func (app *Application) MigrateUp() error {
+	return dao.MigrateUp(app.db)
 }

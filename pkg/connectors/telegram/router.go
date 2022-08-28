@@ -2,6 +2,7 @@ package telegram
 
 import (
 	"context"
+	"fmt"
 	"github.com/getsentry/sentry-go"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
@@ -15,6 +16,10 @@ func sendMessage(bot *tgbotapi.BotAPI, chatId int64, responseText string) error 
 		return sendErr
 	}
 	return nil
+}
+
+func sourceFromMessage(message *tgbotapi.Message) string {
+	return fmt.Sprintf("tg_%d", message.Chat.ID)
 }
 
 func replyToMessage(bot *tgbotapi.BotAPI, message *tgbotapi.Message, responseText string) error {

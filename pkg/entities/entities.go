@@ -6,6 +6,7 @@ type TeamKill struct {
 	Killer     string
 	Victim     string
 	HappenedAt time.Time
+	Source     string
 }
 
 type TopKillerLog struct {
