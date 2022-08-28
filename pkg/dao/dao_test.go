@@ -18,8 +18,6 @@ type TeamKillLogDAOTestCase struct {
 }
 
 func (s *TeamKillLogDAOTestCase) SetupSuite() {
-	log.Println("SetupSuite()")
-
 	db, openErr := sqlx.Open("sqlite3", ":memory:")
 	if openErr != nil {
 		log.Fatalf("Cannot open test sqlite: %s", openErr)
@@ -36,8 +34,6 @@ func (s *TeamKillLogDAOTestCase) SetupSuite() {
 }
 
 func (s *TeamKillLogDAOTestCase) TearDownSuite() {
-	log.Println("TearDownSuite()")
-
 	s.db.Close()
 }
 
@@ -46,8 +42,6 @@ func (s *TeamKillLogDAOTestCase) BeforeTest(suiteName, testName string) {
 }
 
 func (s *TeamKillLogDAOTestCase) Test__InsertTeamKillLog__KillersCalculatedCorrectly() {
-	log.Println("TestExample")
-
 	teamKill := &entities.TeamKill{
 		Killer:     "killer",
 		Victim:     "victim",
@@ -71,8 +65,6 @@ func (s *TeamKillLogDAOTestCase) Test__InsertTeamKillLog__KillersCalculatedCorre
 }
 
 func (s *TeamKillLogDAOTestCase) Test__InsertTeamKillLog__VictimsCalculatedCorrectly() {
-	log.Println("TestExample")
-
 	teamKill := &entities.TeamKill{
 		Killer:     "killer",
 		Victim:     "victim",
@@ -96,8 +88,6 @@ func (s *TeamKillLogDAOTestCase) Test__InsertTeamKillLog__VictimsCalculatedCorre
 }
 
 func (s *TeamKillLogDAOTestCase) Test__InsertTeamKillLogWithDifferentKillers__KillersCountedCorrectly() {
-	log.Println("TestExample")
-
 	teamKillOne := &entities.TeamKill{
 		Killer:     "killer",
 		Victim:     "victim",
@@ -143,8 +133,6 @@ func (s *TeamKillLogDAOTestCase) Test__InsertTeamKillLogWithDifferentKillers__Ki
 }
 
 func (s *TeamKillLogDAOTestCase) Test__InsertTeamKillLogWithDifferentKillers__VictimsCountedCorrectly() {
-	log.Println("TestExample")
-
 	teamKillOne := &entities.TeamKill{
 		Killer:     "killer",
 		Victim:     "victim",
@@ -190,8 +178,6 @@ func (s *TeamKillLogDAOTestCase) Test__InsertTeamKillLogWithDifferentKillers__Vi
 }
 
 func (s *TeamKillLogDAOTestCase) Test__InsertTeamKillLogWithDifferentSources__KillersCountedCorrectly() {
-	log.Println("TestExample")
-
 	teamKillOne := &entities.TeamKill{
 		Killer:     "killer",
 		Victim:     "victim",
@@ -222,8 +208,6 @@ func (s *TeamKillLogDAOTestCase) Test__InsertTeamKillLogWithDifferentSources__Ki
 }
 
 func (s *TeamKillLogDAOTestCase) Test__InsertTeamKillLogWithDifferentSources__VictimsCountedCorrectly() {
-	log.Println("TestExample")
-
 	teamKillOne := &entities.TeamKill{
 		Killer:     "killer",
 		Victim:     "victim",
