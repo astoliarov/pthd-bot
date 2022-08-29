@@ -35,3 +35,7 @@ func NewTeamKillFromText(text string) *TeamKillRequest {
 		Victim: convert(parts[1]),
 	}
 }
+
+type BotKillRequest struct {
+	Victim string
+}
