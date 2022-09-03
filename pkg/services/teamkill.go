@@ -1,7 +1,6 @@
 package services
 
 import (
-	"strings"
 	"teamkillbot/pkg/entities"
 	"teamkillbot/pkg/interfaces"
 	"time"
@@ -21,8 +20,8 @@ func NewTeamKillService(dao interfaces.ITeamKillLogDAO, responseSelector *Respon
 
 func (s *TeamKillService) ProcessTeamKill(request *TeamKillRequest, source string) (string, error) {
 	teamKill := &entities.TeamKill{
-		Killer:     s.normalizeName(request.Killer),
-		Victim:     s.normalizeName(request.Victim),
+		Killer:     normalizeName(request.Killer),
+		Victim:     normalizeName(request.Victim),
 		Source:     source,
 		HappenedAt: time.Now(),
 	}
@@ -37,12 +36,6 @@ func (s *TeamKillService) ProcessTeamKill(request *TeamKillRequest, source strin
 	}
 
 	return response, nil
-}
-
-func (s *TeamKillService) normalizeName(name string) string {
-	name = strings.ToLower(name)
-	name = strings.Replace(name, "ё", "e", -1)
-	return name
 }
 
 func (s *TeamKillService) ProcessGetTopKillers(source string) ([]*entities.TopKillerLog, error) {

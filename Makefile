@@ -9,3 +9,6 @@ docker/build:
 
 docker/push:
 	docker push bghji/teamkillbot
+
+test:
+	go test ./...

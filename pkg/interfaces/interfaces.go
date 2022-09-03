@@ -12,3 +12,8 @@ type ITeamKillLogDAO interface {
 	GetTopKillers(source string) ([]*entities.TopKillerLog, error)
 	GetTopVictims(source string) ([]*entities.TopVictimLog, error)
 }
+
+type IBotKillLogDAO interface {
+	Save(kill *entities.BotKill) error
+	GetTopVictims(source string) ([]*entities.TopVictimLog, error)
+}

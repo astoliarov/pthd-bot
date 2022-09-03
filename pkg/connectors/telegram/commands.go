@@ -213,3 +213,79 @@ func (c *HelpCommand) Process(bot *tgbotapi.BotAPI, message *tgbotapi.Message) e
 func (c *HelpCommand) SetCommands(commands []ICommand) {
 	c.commands = commands
 }
+
+type BotKillCommand struct {
+	service *services.BotKillService
+}
+
+func (c *BotKillCommand) Process(bot *tgbotapi.BotAPI, message *tgbotapi.Message) error {
+	log.Printf("processing message bot kill")
+	request := services.NewBotKillRequest(message.Text)
+	if request == nil {
+		sendErr := replyToMessage(bot, message, cannotParseTeamKillMessage)
+		if sendErr != nil {
+			return sendErr
+		}
+		return nil
+	}
+
+	response, processErr := c.service.ProcessBotKill(request, sourceFromMessage(message))
+	if processErr != nil {
+		return processErr
+	}
+
+	if response != "" {
+		sendErr := replyToMessage(bot, message, response)
+		if sendErr != nil {
+			return sendErr
+		}
+	}
+
+	return nil
+}
+
+func (c *BotKillCommand) IsCommand(text string) bool {
+	return strings.Contains(text, botKillMessageKey)
+}
+
+func (c *BotKillCommand) GetHelp() string {
+	return "<name> #botkill -  записать убийство от бота"
+}
+
+type ShowBotVictimsCommand struct {
+	service *services.BotKillService
+}
+
+func (c *ShowBotVictimsCommand) Process(bot *tgbotapi.BotAPI, message *tgbotapi.Message) error {
+	topVictimsLog, err := c.service.ProcessGetTopVictims(sourceFromMessage(message))
+	if err != nil {
+		replyErr := replyToMessage(bot, message, cannotProcessMessage)
+		log.Printf("Error while trying to send message about error, while processing command: %s", replyErr)
+		return err
+	}
+
+	var rows []string
+	for _, victimLog := range topVictimsLog {
+		row := fmt.Sprintf("Мишень: %s; Наумирал от ботов: %d", victimLog.Name, victimLog.DeathsCount)
+		rows = append(rows, row)
+	}
+	msg := strings.Join(rows, "\n")
+	if msg == "" {
+		msg = "Пока никто не умер от ботов"
+	}
+
+	sendErr := sendMessage(bot, message.Chat.ID, msg)
+	if sendErr != nil {
+		log.Printf("Error while trying to send message: %s", sendErr)
+	}
+
+	return nil
+}
+
+func (c *ShowBotVictimsCommand) IsCommand(text string) bool {
+	return strings.HasPrefix(text, showBotVictims)
+}
+
+func (c *ShowBotVictimsCommand) GetHelp() string {
+	return fmt.Sprintf("%s - вывести список жертв от бота", showBotVictims)
+}

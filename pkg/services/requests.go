@@ -35,3 +35,32 @@ func NewTeamKillFromText(text string) *TeamKillRequest {
 		Victim: convert(parts[1]),
 	}
 }
+
+type BotKillRequest struct {
+	Victim string
+}
+
+func NewBotKillRequest(text string) *BotKillRequest {
+
+	parts := strings.Split(text, "#botkill")
+
+	convert := func(name string) string {
+		name = strings.ToLower(name)
+		name = strings.Trim(name, " ")
+		return name
+	}
+
+	if len(parts) < 1 {
+		return nil
+	}
+
+	victim := convert(parts[0])
+
+	if victim == "" {
+		return nil
+	}
+
+	return &BotKillRequest{
+		Victim: convert(parts[0]),
+	}
+}

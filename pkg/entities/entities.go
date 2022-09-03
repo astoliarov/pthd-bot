@@ -9,6 +9,12 @@ type TeamKill struct {
 	Source     string
 }
 
+type BotKill struct {
+	Victim     string
+	HappenedAt time.Time
+	Source     string
+}
+
 type TopKillerLog struct {
 	Name      string `db:"name"`
 	KillCount int    `db:"kill_count"`
