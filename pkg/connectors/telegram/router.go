@@ -35,24 +35,34 @@ func replyToMessage(bot *tgbotapi.BotAPI, message *tgbotapi.Message, responseTex
 type MessageRouter struct {
 	bot               *tgbotapi.BotAPI
 	teamKillService   *services.TeamKillService
+	botKillService    *services.TeamKillService
 	messageProcessors map[int]func(message *tgbotapi.Message) error
 	commands          []ICommand
 	chatID            int64
 }
 
-func NewMessageRouter(bot *tgbotapi.BotAPI, service *services.TeamKillService, chatID int64) *MessageRouter {
+func NewMessageRouter(
+	bot *tgbotapi.BotAPI,
+	teamKillService *services.TeamKillService,
+	botKillService *services.BotKillService,
+	chatID int64,
+) *MessageRouter {
 
 	echoCommand := &CommandEcho{}
-	teamKillCommand := &TeamKillCommand{teamKillService: service}
-	showKillersCommand := &ShowKillersCommand{teamKillService: service}
-	showVictimsCommand := &ShowVictimsCommand{teamKillService: service}
-	repeatCommand := &RepeatCommand{teamKillService: service}
+	teamKillCommand := &TeamKillCommand{teamKillService: teamKillService}
+	botKillCommand := &BotKillCommand{service: botKillService}
+	showKillersCommand := &ShowKillersCommand{teamKillService: teamKillService}
+	showVictimsCommand := &ShowVictimsCommand{teamKillService: teamKillService}
+	showBotVictimsCommand := &ShowBotVictimsCommand{service: botKillService}
+	repeatCommand := &RepeatCommand{teamKillService: teamKillService}
 	helpCommand := &HelpCommand{commands: []ICommand{}}
 	commands := []ICommand{
 		echoCommand,
+		botKillCommand,
 		teamKillCommand,
 		showKillersCommand,
 		showVictimsCommand,
+		showBotVictimsCommand,
 		repeatCommand,
 		helpCommand,
 	}
@@ -60,7 +70,7 @@ func NewMessageRouter(bot *tgbotapi.BotAPI, service *services.TeamKillService, c
 
 	router := &MessageRouter{
 		bot:             bot,
-		teamKillService: service,
+		teamKillService: teamKillService,
 		commands:        commands,
 		chatID:          chatID,
 	}

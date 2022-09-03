@@ -17,6 +17,7 @@ type Application struct {
 	db              *sqlx.DB
 	teamKillLogDAO  *dao.TeamKillLogDAO
 	teamKillService *services.TeamKillService
+	botKillService  *services.BotKillService
 }
 
 func NewApplication() *Application {
@@ -31,6 +32,7 @@ func NewApplication() *Application {
 	}
 
 	teamKillDAO := dao.NewTeamKillLogDAO(db)
+	botKillDAO := dao.NewBotKillLogDAO(db)
 
 	responseSelector := &services.ResponseSelectorService{}
 	teamKillService := services.NewTeamKillService(
@@ -38,11 +40,14 @@ func NewApplication() *Application {
 		responseSelector,
 	)
 
+	botKillService := services.NewBotKillService(botKillDAO, responseSelector)
+
 	app := &Application{
 		Config:          config,
 		db:              db,
 		teamKillLogDAO:  teamKillDAO,
 		teamKillService: teamKillService,
+		botKillService:  botKillService,
 	}
 
 	return app
@@ -57,6 +62,7 @@ func (app *Application) RunBot(ctx context.Context) {
 	router := telegram.NewMessageRouter(
 		bot,
 		app.teamKillService,
+		app.botKillService,
 		app.Config.ChatID,
 	)
 

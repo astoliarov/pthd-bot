@@ -1,9 +1,11 @@
 package telegram
 
 const teamKillMessageKey = "#teamkill"
+const botKillMessageKey = "#botkill"
 const echoKey = "/pthd_echo"
 const showKillers = "/pthd_show_killers"
 const showVictims = "/pthd_show_victims"
+const showBotVictims = "/pthd_show_bot_victims"
 const repeat = "/pthd_show_repeat"
 const help = "/pthd_help"
 

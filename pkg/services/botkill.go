@@ -19,12 +19,12 @@ func NewBotKillService(dao interfaces.IBotKillLogDAO, responseSelector *Response
 }
 
 func (s *BotKillService) ProcessBotKill(request *BotKillRequest, source string) (string, error) {
-	teamKill := &entities.BotKill{
+	botKill := &entities.BotKill{
 		Victim:     normalizeName(request.Victim),
 		Source:     source,
 		HappenedAt: time.Now(),
 	}
-	saveErr := s.dao.Save(teamKill)
+	saveErr := s.dao.Save(botKill)
 	if saveErr != nil {
 		return "", saveErr
 	}
