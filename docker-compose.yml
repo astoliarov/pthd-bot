@@ -1,5 +1,5 @@
 services:
-  teamkillbot:
+  pthd-bot:
     build: .
     environment:
       tkbot_db_path: /host-mnt/teamkillbot.sqlite

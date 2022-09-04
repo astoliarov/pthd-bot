@@ -1,4 +1,4 @@
-module teamkillbot
+module pthd-bot
 
 go 1.18
 

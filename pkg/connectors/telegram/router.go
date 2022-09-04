@@ -6,7 +6,7 @@ import (
 	"github.com/getsentry/sentry-go"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
-	"teamkillbot/pkg/services"
+	"pthd-bot/pkg/services"
 )
 
 func sendMessage(bot *tgbotapi.BotAPI, chatId int64, responseText string) error {

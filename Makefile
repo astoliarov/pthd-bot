@@ -5,10 +5,10 @@ run/bot:
 	./bin/bot
 
 docker/build:
-	docker buildx build -t bghji/teamkillbot . --platform=linux/amd64
+	docker buildx build -t bghji/pthd-bot . --platform=linux/amd64
 
 docker/push:
-	docker push bghji/teamkillbot
+	docker push bghji/pthd-bot
 
 test:
 	go test ./...

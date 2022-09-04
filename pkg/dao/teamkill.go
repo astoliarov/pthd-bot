@@ -3,7 +3,7 @@ package dao
 import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
-	"teamkillbot/pkg/entities"
+	"pthd-bot/pkg/entities"
 )
 
 type TeamKillLogDAO struct {

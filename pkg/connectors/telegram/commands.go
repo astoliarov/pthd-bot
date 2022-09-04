@@ -4,8 +4,8 @@ import (
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
+	"pthd-bot/pkg/services"
 	"strings"
-	"teamkillbot/pkg/services"
 )
 
 type ICommand interface {

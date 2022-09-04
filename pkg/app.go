@@ -6,9 +6,9 @@ import (
 	"github.com/getsentry/sentry-go"
 	"github.com/jmoiron/sqlx"
 	"log"
-	"teamkillbot/pkg/connectors/telegram"
-	"teamkillbot/pkg/dao"
-	"teamkillbot/pkg/services"
+	"pthd-bot/pkg/connectors/telegram"
+	"pthd-bot/pkg/dao"
+	"pthd-bot/pkg/services"
 	"time"
 )
 

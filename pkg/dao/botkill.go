@@ -2,7 +2,7 @@ package dao
 
 import (
 	"github.com/jmoiron/sqlx"
-	"teamkillbot/pkg/entities"
+	"pthd-bot/pkg/entities"
 )
 
 type BotKillLogDAO struct {

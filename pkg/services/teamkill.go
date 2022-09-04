@@ -1,8 +1,8 @@
 package services
 
 import (
-	"teamkillbot/pkg/entities"
-	"teamkillbot/pkg/interfaces"
+	"pthd-bot/pkg/entities"
+	"pthd-bot/pkg/interfaces"
 	"time"
 )
 

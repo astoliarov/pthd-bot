@@ -6,8 +6,8 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"pthd-bot/pkg"
 	"syscall"
-	"teamkillbot/pkg"
 )
 
 func main() {

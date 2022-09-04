@@ -5,7 +5,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"log"
-	"teamkillbot/pkg/entities"
+	"pthd-bot/pkg/entities"
 	"testing"
 	"time"
 )
