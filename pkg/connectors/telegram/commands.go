@@ -88,6 +88,9 @@ func (c *ShowKillersCommand) Process(bot *tgbotapi.BotAPI, message *tgbotapi.Mes
 		rows = append(rows, row)
 	}
 	msg := strings.Join(rows, "\n")
+	if msg == "" {
+		msg = "Пока никто никого не убил"
+	}
 
 	sendErr := sendMessage(bot, message.Chat.ID, msg)
 	if sendErr != nil {
@@ -125,6 +128,9 @@ func (c *ShowVictimsCommand) Process(bot *tgbotapi.BotAPI, message *tgbotapi.Mes
 		rows = append(rows, row)
 	}
 	msg := strings.Join(rows, "\n")
+	if msg == "" {
+		msg = "Пока никто никого не убил"
+	}
 
 	sendErr := sendMessage(bot, message.Chat.ID, msg)
 	if sendErr != nil {
