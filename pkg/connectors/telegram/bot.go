@@ -2,7 +2,7 @@ package telegram
 
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"log"
+	"github.com/rs/zerolog/log"
 )
 
 func InitBot(token string) (*tgbotapi.BotAPI, error) {
@@ -11,9 +11,9 @@ func InitBot(token string) (*tgbotapi.BotAPI, error) {
 		return nil, err
 	}
 
-	bot.Debug = true
+	bot.Debug = false
 
-	log.Printf("Authorized on account %s", bot.Self.UserName)
+	log.Info().Str("username", bot.Self.UserName).Msg("Authorized on account")
 
 	return bot, nil
 }

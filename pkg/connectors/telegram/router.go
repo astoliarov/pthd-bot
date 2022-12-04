@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/getsentry/sentry-go"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"log"
+	"github.com/rs/zerolog/log"
 	"pthd-bot/pkg/services"
 )
 
@@ -13,6 +13,7 @@ func sendMessage(bot *tgbotapi.BotAPI, chatId int64, responseText string) error 
 	msg := tgbotapi.NewMessage(chatId, responseText)
 	_, sendErr := bot.Send(msg)
 	if sendErr != nil {
+		log.Error().Err(sendErr).Msg("Error while trying to send message")
 		return sendErr
 	}
 	return nil
@@ -27,6 +28,7 @@ func replyToMessage(bot *tgbotapi.BotAPI, message *tgbotapi.Message, responseTex
 	msg.ReplyToMessageID = message.MessageID
 	_, sendErr := bot.Send(msg)
 	if sendErr != nil {
+		log.Error().Err(sendErr).Msg("Error while trying to reply to message")
 		return sendErr
 	}
 	return nil
@@ -82,7 +84,7 @@ func (r *MessageRouter) registerCommand(command ICommand) {
 	r.commands = append(r.commands, command)
 }
 
-func (r MessageRouter) ListenToUpdates(ctx context.Context) {
+func (r *MessageRouter) ListenToUpdates(ctx context.Context) {
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 
@@ -92,21 +94,27 @@ func (r MessageRouter) ListenToUpdates(ctx context.Context) {
 		select {
 		case update := <-updates:
 			if update.Message != nil { // If we got a message
-				log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
+				log.Debug().
+					Str("from", update.Message.From.UserName).
+					Str("text", update.Message.Text).
+					Msg("received message")
+
 				processErr := r.processMessage(update.Message)
 				if processErr != nil {
 					sentry.CaptureException(processErr)
-					log.Printf("Error while processing message: %s", processErr)
+					log.Error().
+						Err(processErr).
+						Msg("Error while processing message")
 				}
 			}
 		case <-ctx.Done():
-			log.Println("Stopping router")
+			log.Info().Msg("Stopping router")
 			return
 		}
 	}
 }
 
-func (r MessageRouter) processMessage(message *tgbotapi.Message) error {
+func (r *MessageRouter) processMessage(message *tgbotapi.Message) error {
 	if message.Chat.ID != r.chatID {
 		return nil
 	}

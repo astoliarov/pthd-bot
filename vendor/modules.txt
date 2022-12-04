@@ -23,6 +23,12 @@ github.com/heetch/confita/backend/env
 ## explicit; go 1.10
 github.com/jmoiron/sqlx
 github.com/jmoiron/sqlx/reflectx
+# github.com/mattn/go-colorable v0.1.12
+## explicit; go 1.13
+github.com/mattn/go-colorable
+# github.com/mattn/go-isatty v0.0.14
+## explicit; go 1.12
+github.com/mattn/go-isatty
 # github.com/mattn/go-sqlite3 v1.14.14
 ## explicit; go 1.12
 github.com/mattn/go-sqlite3
@@ -32,6 +38,12 @@ github.com/pmezard/go-difflib/difflib
 # github.com/pressly/goose/v3 v3.6.1
 ## explicit; go 1.17
 github.com/pressly/goose/v3
+# github.com/rs/zerolog v1.28.0
+## explicit; go 1.15
+github.com/rs/zerolog
+github.com/rs/zerolog/internal/cbor
+github.com/rs/zerolog/internal/json
+github.com/rs/zerolog/log
 # github.com/stretchr/testify v1.8.0
 ## explicit; go 1.13
 github.com/stretchr/testify/assert
@@ -40,6 +52,8 @@ github.com/stretchr/testify/suite
 # golang.org/x/sys v0.0.0-20220429233432-b5fbb4746d32
 ## explicit; go 1.17
 golang.org/x/sys/execabs
+golang.org/x/sys/internal/unsafeheader
+golang.org/x/sys/unix
 # gopkg.in/yaml.v3 v3.0.1
 ## explicit
 gopkg.in/yaml.v3

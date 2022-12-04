@@ -18,7 +18,7 @@ func NewBotKillService(dao interfaces.IBotKillLogDAO, responseSelector *Response
 	}
 }
 
-func (s *BotKillService) ProcessBotKill(request *BotKillRequest, source string) (string, error) {
+func (s *BotKillService) AddBotKill(request *BotKillRequest, source string) (string, error) {
 	botKill := &entities.BotKill{
 		Victim:     normalizeName(request.Victim),
 		Source:     source,
@@ -37,6 +37,6 @@ func (s *BotKillService) ProcessBotKill(request *BotKillRequest, source string) 
 	return response, nil
 }
 
-func (s *BotKillService) ProcessGetTopVictims(source string) ([]*entities.TopVictimLog, error) {
+func (s *BotKillService) GetTopBotVictims(source string) ([]*entities.TopVictimLog, error) {
 	return s.dao.GetTopVictims(source)
 }
