@@ -64,6 +64,20 @@ func (suite *TeamKillServiceTestCase) Test_AddTeamKill_SaveReturnedError_Process
 	assert.Equal(suite.T(), response, "")
 }
 
+func (suite *TeamKillServiceTestCase) Test_validateName_NoMixOfAlphabets_NoErr() {
+
+	err := suite.service.validateName("рома")
+
+	assert.Nil(suite.T(), err)
+}
+
+func (suite *TeamKillServiceTestCase) Test_validateName_MixOfAlphabets_Err() {
+
+	err := suite.service.validateName("рoма")
+
+	assert.NotNil(suite.T(), err)
+}
+
 func TestTeamKillService(t *testing.T) {
 	testSuite := TeamKillServiceTestCase{}
 	suite.Run(t, &testSuite)
