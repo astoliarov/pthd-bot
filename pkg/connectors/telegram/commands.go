@@ -47,7 +47,19 @@ func (c *TeamKillCommand) Process(bot *tgbotapi.BotAPI, message *tgbotapi.Messag
 
 	response, processErr := c.teamKillService.AddTeamKill(request, sourceFromMessage(message))
 	if processErr != nil {
-		return processErr
+		switch processErr.(type) {
+		case *services.ErrMixedCharactersInName:
+			castedErr := processErr.(*services.ErrMixedCharactersInName)
+			msg := fmt.Sprintf("В имени \"%s\" есть кириллица и латиница", castedErr.Name)
+			sendErr := replyToMessage(bot, message, msg)
+			if sendErr != nil {
+				return sendErr
+			}
+		default:
+			return processErr
+		}
+
+		return nil
 	}
 
 	if response != "" {
