@@ -2,10 +2,9 @@ package pkg
 
 import (
 	"context"
-	"fmt"
 	"github.com/getsentry/sentry-go"
 	"github.com/jmoiron/sqlx"
-	"log"
+	"github.com/rs/zerolog/log"
 	"pthd-bot/pkg/connectors/telegram"
 	"pthd-bot/pkg/dao"
 	"pthd-bot/pkg/services"
@@ -21,14 +20,19 @@ type Application struct {
 }
 
 func NewApplication() *Application {
+	setupLogs()
+
 	config, configLoadErr := ConfitaConfigLoader()
 	if configLoadErr != nil {
-		log.Fatalf(fmt.Sprintf("Issue while loading config: %s", configLoadErr))
+		log.Fatal().Err(configLoadErr).Msg("Can't load config")
 	}
 
 	db, openErr := dao.OpenSQLite(config.PathToSQLite)
 	if openErr != nil {
-		log.Fatalf("Cannot open sqlite: %s", openErr)
+		log.Fatal().
+			Err(openErr).
+			Str("path", config.PathToSQLite).
+			Msg("Can't open sqlite")
 	}
 
 	teamKillDAO := dao.NewTeamKillLogDAO(db)
@@ -56,7 +60,9 @@ func NewApplication() *Application {
 func (app *Application) RunBot(ctx context.Context) {
 	bot, connectionErr := telegram.InitBot(app.Config.BotTGToken)
 	if connectionErr != nil {
-		log.Fatalf("Cannot open telegram bot: %s", connectionErr)
+		log.Fatal().
+			Err(connectionErr).
+			Msg("Can't open telegram bot")
 	}
 
 	router := telegram.NewMessageRouter(

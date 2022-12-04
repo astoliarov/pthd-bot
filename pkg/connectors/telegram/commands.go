@@ -3,7 +3,7 @@ package telegram
 import (
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"log"
+	"github.com/rs/zerolog/log"
 	"pthd-bot/pkg/services"
 	"strings"
 )
@@ -17,6 +17,7 @@ type ICommand interface {
 type CommandEcho struct{}
 
 func (c *CommandEcho) Process(bot *tgbotapi.BotAPI, message *tgbotapi.Message) error {
+	log.Info().Msg("processing message echo")
 	return replyToMessage(bot, message, message.Text)
 }
 
@@ -33,7 +34,8 @@ type TeamKillCommand struct {
 }
 
 func (c *TeamKillCommand) Process(bot *tgbotapi.BotAPI, message *tgbotapi.Message) error {
-	log.Printf("processing message team kill")
+	log.Info().Msg("processing message team kill")
+
 	request := services.NewTeamKillFromText(message.Text)
 	if request == nil {
 		sendErr := replyToMessage(bot, message, cannotParseTeamKillMessage)
@@ -43,13 +45,14 @@ func (c *TeamKillCommand) Process(bot *tgbotapi.BotAPI, message *tgbotapi.Messag
 		return nil
 	}
 
-	response, processErr := c.teamKillService.ProcessTeamKill(request, sourceFromMessage(message))
+	response, processErr := c.teamKillService.AddTeamKill(request, sourceFromMessage(message))
 	if processErr != nil {
 		return processErr
 	}
 
 	if response != "" {
 		sendErr := replyToMessage(bot, message, response)
+		log.Error().Err(sendErr).Msg("Error while trying to send message")
 		if sendErr != nil {
 			return sendErr
 		}
@@ -71,10 +74,11 @@ type ShowKillersCommand struct {
 }
 
 func (c *ShowKillersCommand) Process(bot *tgbotapi.BotAPI, message *tgbotapi.Message) error {
-	topKillersLog, err := c.teamKillService.ProcessGetTopKillers(sourceFromMessage(message))
+	log.Info().Msg("processing message show killers")
+
+	topKillersLog, err := c.teamKillService.GetTopKillers(sourceFromMessage(message))
 	if err != nil {
-		replyErr := replyToMessage(bot, message, cannotProcessMessage)
-		log.Printf("Error while trying to send message about error, while processing command: %s", replyErr)
+		replyToMessage(bot, message, cannotProcessMessage)
 		return err
 	}
 
@@ -84,10 +88,13 @@ func (c *ShowKillersCommand) Process(bot *tgbotapi.BotAPI, message *tgbotapi.Mes
 		rows = append(rows, row)
 	}
 	msg := strings.Join(rows, "\n")
+	if msg == "" {
+		msg = "Пока никто никого не убил"
+	}
 
 	sendErr := sendMessage(bot, message.Chat.ID, msg)
 	if sendErr != nil {
-		log.Printf("Error while trying to send message: %s", sendErr)
+		return sendErr
 	}
 
 	return nil
@@ -106,10 +113,12 @@ type ShowVictimsCommand struct {
 }
 
 func (c *ShowVictimsCommand) Process(bot *tgbotapi.BotAPI, message *tgbotapi.Message) error {
-	topVictimsLog, err := c.teamKillService.ProcessGetTopVictims(sourceFromMessage(message))
+	log.Info().Msg("processing message show victims")
+
+	topVictimsLog, err := c.teamKillService.GetTopVictims(sourceFromMessage(message))
 	if err != nil {
 		replyErr := replyToMessage(bot, message, cannotProcessMessage)
-		log.Printf("Error while trying to send message about error, while processing command: %s", replyErr)
+		log.Error().Err(replyErr).Msg("Error while trying to send message about error, while processing command")
 		return err
 	}
 
@@ -119,10 +128,13 @@ func (c *ShowVictimsCommand) Process(bot *tgbotapi.BotAPI, message *tgbotapi.Mes
 		rows = append(rows, row)
 	}
 	msg := strings.Join(rows, "\n")
+	if msg == "" {
+		msg = "Пока никто никого не убил"
+	}
 
 	sendErr := sendMessage(bot, message.Chat.ID, msg)
 	if sendErr != nil {
-		log.Printf("Error while trying to send message: %s", sendErr)
+		return sendErr
 	}
 
 	return nil
@@ -141,7 +153,7 @@ type RepeatCommand struct {
 }
 
 func (c *RepeatCommand) Process(bot *tgbotapi.BotAPI, message *tgbotapi.Message) error {
-	log.Printf("processing message repeat")
+	log.Info().Msg("processing message repeat")
 
 	if message.ReplyToMessage == nil {
 		sendErr := replyToMessage(bot, message, "Нечего повторять, ну")
@@ -160,7 +172,7 @@ func (c *RepeatCommand) Process(bot *tgbotapi.BotAPI, message *tgbotapi.Message)
 		return nil
 	}
 
-	response, processErr := c.teamKillService.ProcessTeamKill(request, sourceFromMessage(message))
+	response, processErr := c.teamKillService.AddTeamKill(request, sourceFromMessage(message))
 	if processErr != nil {
 		return processErr
 	}
@@ -196,6 +208,8 @@ func (c *HelpCommand) GetHelp() string {
 }
 
 func (c *HelpCommand) Process(bot *tgbotapi.BotAPI, message *tgbotapi.Message) error {
+	log.Info().Msg("processing message help")
+
 	var rows []string
 	for _, command := range c.commands {
 		rows = append(rows, command.GetHelp())
@@ -204,7 +218,7 @@ func (c *HelpCommand) Process(bot *tgbotapi.BotAPI, message *tgbotapi.Message) e
 
 	sendErr := sendMessage(bot, message.Chat.ID, msg)
 	if sendErr != nil {
-		log.Printf("Error while trying to send message: %s", sendErr)
+		return sendErr
 	}
 
 	return nil
@@ -219,7 +233,7 @@ type BotKillCommand struct {
 }
 
 func (c *BotKillCommand) Process(bot *tgbotapi.BotAPI, message *tgbotapi.Message) error {
-	log.Printf("processing message bot kill")
+	log.Info().Msg("processing message bot kill")
 	request := services.NewBotKillRequest(message.Text)
 	if request == nil {
 		sendErr := replyToMessage(bot, message, cannotParseTeamKillMessage)
@@ -229,7 +243,7 @@ func (c *BotKillCommand) Process(bot *tgbotapi.BotAPI, message *tgbotapi.Message
 		return nil
 	}
 
-	response, processErr := c.service.ProcessBotKill(request, sourceFromMessage(message))
+	response, processErr := c.service.AddBotKill(request, sourceFromMessage(message))
 	if processErr != nil {
 		return processErr
 	}
@@ -257,7 +271,9 @@ type ShowBotVictimsCommand struct {
 }
 
 func (c *ShowBotVictimsCommand) Process(bot *tgbotapi.BotAPI, message *tgbotapi.Message) error {
-	topVictimsLog, err := c.service.ProcessGetTopVictims(sourceFromMessage(message))
+	log.Info().Msg("processing message show bot victims")
+
+	topVictimsLog, err := c.service.GetTopBotVictims(sourceFromMessage(message))
 	if err != nil {
 		replyErr := replyToMessage(bot, message, cannotProcessMessage)
 		log.Printf("Error while trying to send message about error, while processing command: %s", replyErr)
@@ -276,7 +292,7 @@ func (c *ShowBotVictimsCommand) Process(bot *tgbotapi.BotAPI, message *tgbotapi.
 
 	sendErr := sendMessage(bot, message.Chat.ID, msg)
 	if sendErr != nil {
-		log.Printf("Error while trying to send message: %s", sendErr)
+		return sendErr
 	}
 
 	return nil
